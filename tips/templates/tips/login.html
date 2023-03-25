@@ -1,0 +1,39 @@
+<!-- tips/templates/tips/register.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load bulma_tags %}
+
+<div class="register column is-8 is-offset-2">
+  <div class="columns">
+    <div class="column has-text-centered">
+      <h3 class="title" style="color: ghostwhite;">Login</h1><br>
+    </div>
+  </div>
+    <form method="POST" action="" class="box" style="background-color:ghostwhite">
+      {% csrf_token %}
+      {{ login_form|bulma }}
+      <br />
+      <button class="button is-block is-fullwidth is-primary is-medium is-rounded is-success" type="submit">
+        Login
+      </button>
+    </form>
+    <br>
+    <nav class="level">
+      <div class="level-item has-text-centered">
+        <div>
+          <a href="#">Forgot Password?</a>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <a href="{% url 'tips:register' %}">Create an Account</a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</div>
+
+{% endblock content %}

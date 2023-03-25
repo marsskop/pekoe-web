@@ -1,0 +1,77 @@
+import uuid
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+
+class Cafe(models.Model):
+    slug = models.CharField(max_length=20, unique=True, default=uuid.uuid4().hex[:16])
+    title = models.CharField(max_length=50)
+    location = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"Cafe @{self.slug} {self.title}, location: {self.location}"
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=20, unique=True, default=uuid.uuid4().hex[:16])
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    email = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False) # a admin user; non super-user
+    is_superuser = models.BooleanField(default=False) # a superuser
+    last_login = models.DateTimeField(null=True, blank=True)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = []
+
+    objects = UserManager()
+
+    def __str__(self):
+        return f"User @{self.username}, {self.first_name} {self.last_name}, email: {self.email}"
+
+
+class Customer(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    customer_wallet = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"Customer {self.user.username}, wallet: {self.customer_wallet}"
+
+
+# automatically add Customer role to User
+@receiver(post_save, sender=User)
+def create_customer(sender, instance, created, **kwargs):
+    if created:
+        customer = Customer(user=instance)
+        customer.save()
+
+
+class Waiter(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    waiter_wallet = models.CharField(max_length=50)
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Waiter {self.user.username} in cafe {self.cafe.title}, wallet: {self.waiter_wallet}"
+
+
+class CafeAdmin(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"Cafe admin {self.user.username} in cafe {self.cafe.title}"
+
+
+class Transaction(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)  # should we delete transactions?
+    waiter = models.ForeignKey(Waiter, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(auto_now=True)
+    amount = models.PositiveBigIntegerField()
+    comment = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"Transaction {self.id} from customer {self.customer} to waiter {self.waiter}, datetime: {self.datetime}, amount: {self.amount}, comment: {self.comment}"

@@ -1,0 +1,77 @@
+<!-- tips/templates/tips/cafe.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="column">
+    <div class="media">
+        <div class="media-left">
+          <figure class="image is-48x48">
+            <img src="https://source.unsplash.com/random/200x200?sig=3"
+                alt="Placeholder image">
+          </figure>
+        </div>
+        <div class="media-content">
+          <p class="title is-4" style="color: ghostwhite;">
+            {{ cafe.title }}
+          </p>
+          <p class="subtitle is-6" style="color: ghostwhite;">
+            @{{ cafe.slug }}
+          </p>
+          <p class="subtitle is-6" style="color: ghostwhite;">
+            Location: {{ cafe.location }}
+          </p>
+
+          <div class="columns">
+            {% if waiters_list %}
+            <div class="column has-text-centered">
+              <h1 class="title" style="color: ghostwhite;">Waiters</h1><br>
+            </div>
+          </div>
+
+            <div id="app" class="row columns is-multiline">
+              {% for waiter in waiters_list %}
+                <div class="column is-3">
+                    <div class="card large">
+                      <a href="{% url 'tips:waiter' cafe_slug=cafe.slug waiter_username=waiter.user.username %}">
+                        <div class="card-image">
+                          <figure class="image is-16by9">
+                            <img src="https://source.unsplash.com/random/200x200?sig=1"
+                                      alt="Placeholder image">
+                          </figure>
+                        </div>
+                        <div class="card-content">
+                            <div class="media">
+                              <div class="media-left">
+                                <figure class="image is-48x48">
+                                  <img src="https://source.unsplash.com/random/200x200?sig=2"
+                                        alt="Placeholder image">
+                                </figure>
+                              </div>
+                              <div class="media-content">
+                                <p class="title is-4">
+                                    {{ waiter.user.first_name }} {{ waiter.user.last_name }}
+                                </p>
+                                <p class="subtitle is-6">
+                                    @{{ waiter.user.username }}
+                                </p>
+                                </div>
+                            </div>
+                        </div>
+                      </a>
+                  </div>
+                </div>
+              
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="column has-text-centered">
+              <h1 class="title" style="color: ghostwhite;">No waiters registered.</h1><br>
+            </div>
+          {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

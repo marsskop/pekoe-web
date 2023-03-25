@@ -1,0 +1,66 @@
+:root {
+    --bg: #205544;
+    --card-bg: #102f39;
+  }
+  
+  body {
+    background: var(--bg);
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .box {
+    background: var(--card-bg);
+  }
+  
+  input::placeholder {
+    color: antiquewhite;
+  }
+  
+  .navbar {
+    background: var(--card-bg);
+  }
+  
+  .navbar-item {
+    color: ghostwhite;
+  }
+  
+  .card {
+    overflow: hidden;
+    background: ghostwhite;
+    color: var(--bg);
+  }
+  
+  .card.large {
+    border-radius: 5px;
+  }
+  
+  .title.no-padding {
+    margin-bottom: 0 !important;
+  }
+
+  .tabs li.tab.is-active a {
+    background: var(--bg);
+  }
+  
+  .footer {
+    background: var(--card-bg);
+    color: ghostwhite;
+    margin-top: auto;
+  }
+  
+  .footer p,
+  strong {
+    color: ghostwhite
+  }
+  
+  .footer a:hover {
+    color: crimson;
+  }
+  
+  .fa {
+    color: ghostwhite;
+    margin: 10px
+  }

@@ -1,0 +1,63 @@
+<!-- tips/templates/tips/index.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="columns">
+  <div class="column has-text-centered">
+    <h1 class="title" style="color: ghostwhite;">Cafes</h1><br>
+  </div>
+</div>
+
+{% if cafes_list %}
+
+<div id="app" class="row columns is-multiline">
+
+{% for cafe in cafes_list %}
+  <div class="column is-3">
+      <div class="card large">
+        <a href="{% url 'tips:cafe' cafe.slug %}">
+          <div class="card-image">
+            <figure class="image is-16by9">
+              <img src="https://source.unsplash.com/random/200x200?sig=1"
+                        alt="Placeholder image">
+            </figure>
+          </div>
+          <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-48x48">
+                    <img src="https://source.unsplash.com/random/200x200?sig=2"
+                          alt="Placeholder image">
+                  </figure>
+                </div>
+                <div class="media-content">
+                  <p class="title is-4">
+                      {{ cafe.title }}
+                  </p>
+                  <p class="subtitle is-6">
+                    @{{ cafe.slug|lower }}
+                  </p>
+                </div>
+              </div>
+          </div>
+        </a>
+    </div>
+  </div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+<div class="columns">
+  <div class="column has-text-centered">
+    <h1 class="title" style="color: ghostwhite;">No cafes found.</h1><br>
+  </div>
+</div>
+{% endif %}
+
+</div>
+
+{% endblock content %}

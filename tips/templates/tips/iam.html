@@ -1,0 +1,226 @@
+<!-- tips/templates/tips/cafe.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load widget_tweaks %}
+
+{% if request.user.is_authenticated and request.user.username == user.username %}
+<div class="media">
+    <div class="media-left">
+        <figure class="image is-48x48">
+        <img src="https://source.unsplash.com/random/200x200?sig=3"
+                alt="Placeholder image">
+        </figure>
+    </div>
+    <div class="media-content">
+        <p class="title is-4" style="color: ghostwhite;">
+            <span class="icon">
+                <i class="fa fa-at"></i>
+            </span>
+            <span>{{ user.username }}</span>
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field">
+                        <p class="control is-expanded">
+                            {{ user_form.first_name|add_class:"input" }}
+                        </p>
+                    </div>
+                    <div class="field">
+                        <p class="control is-expanded">
+                            {{ user_form.last_name|add_class:"input" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-body">
+                    <div class="field">
+                        <p class="control is-expanded has-icons-left">
+                            {{ user_form.email|add_class:"input" }}
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div class="field">
+                        <p class="control">
+                            <button class="button is-primary" type="submit">
+                                Update
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<br>
+
+<div class="tabs is-centered is-large is-boxed">
+    <ul>
+        <li class="tab is-active" onclick="openTab(event, 'customer')">
+            <a>
+                <span class="icon is-small"><i class="fa fa-user" aria-hidden="true"></i></span>
+                <span style="color: ghostwhite;">Customer</span>
+            </a>
+        </li>
+        <li class="tab" onclick="openTab(event, 'waiter')">
+            <a>
+                <span class="icon is-small"><i class="fa fa-user-plus" aria-hidden="true"></i></span>
+                <span style="color: ghostwhite;">Waiter</span>
+            </a>
+        </li>
+        <li class="tab" onclick="openTab(event, 'cafeadmin')">
+            <a>
+                <span class="icon is-small"><i class="fa fa-user-tie" aria-hidden="true"></i></span>
+                <span style="color: ghostwhite;">Cafe Admin</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div id="customer" class="tabcontent">
+    <div class="media">
+        <div class="media-left">
+            <figure class="image is-48x48">
+              </figure>
+        </div>
+        <div class="media-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ customer_form.customer_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="waiter" class="tabcontent" style="display: none">
+        {% if waiter_forms %}
+        {% for key, form in waiter_forms.items %}
+        <div class="media">
+            <div class="media-left">
+                <a href="{% url 'tips:waiter' cafe_slug=key waiter_username=user.username %}">
+                <figure class="image is-48x48">
+                    <img src="https://source.unsplash.com/random/200x200?sig=1"
+                        alt="Placeholder image">
+                  </figure>
+                </a>
+            </div>
+            <div class="media-content">
+            <a href="{% url 'tips:waiter' cafe_slug=key waiter_username=user.username %}">
+                <p class="title is-4" style="color: ghostwhite;">
+                    @{{ key }}
+                </p>
+            </a>
+            <br>
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ form.waiter_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h2 class="subtitle is-6" style="color: ghostwhite;">
+            <span class="icon">
+                <i class="fa fa-lock"></i>
+            </span>
+            <span>You are not a waiter anywhere</span>
+        {% endif %}
+</div>
+
+<div id="cafeadmin" class="tabcontent" style="display: none">
+    {% if cafe_admins_list %}
+    {% for cafe_admin in cafe_admins_list %}
+    <a href="{% url 'tips:cafe' cafe_admin.cafe.slug %}">
+        <div class="media">
+            <div class="media-left">
+                <figure class="image is-48x48">
+                    <img src="https://source.unsplash.com/random/200x200?sig=1"
+                        alt="Placeholder image">
+                </figure>
+            </div>
+            <div class="media-content">
+                <p class="title is-4" style="color: ghostwhite;">
+                    {{ cafe_admin.cafe.title }} @{{ cafe_admin.cafe.slug }}
+                </p>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <h2 class="subtitle is-6" style="color: ghostwhite;">
+        <span class="icon">
+            <i class="fa fa-lock"></i>
+        </span>
+        <span>You are not a cafe admin anywhere</span>
+    {% endif %}
+</div>
+
+{% else %}
+    <article class="message is-warning">
+        <div class="message-body">
+            You are not authorized to view this page.
+        </div>
+        </article>
+{% endif %}
+
+<script type="text/javascript">
+function openTab(evt, tabName) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < x.length; i++) {
+      x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tab");
+  for (i = 0; i < x.length; i++) {
+      tablinks[i].className = tablinks[i].className.replace(" is-active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " is-active";
+}
+</script>
+
+{% endblock content %}

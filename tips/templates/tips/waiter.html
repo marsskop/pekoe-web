@@ -1,0 +1,41 @@
+<!-- tips/templates/tips/cafe.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="column">
+    <div class="media">
+        <div class="media-left">
+          <figure class="image is-48x48">
+            <img src="https://source.unsplash.com/random/200x200?sig=1"
+                 alt="Placeholder image">
+          </figure>
+        </div>
+        <div class="media-content">
+            <p class="title is-4" style="color: ghostwhite;">
+                {{ waiter.user.first_name }} {{ waiter.user.last_name }}
+            </p>
+            <p class="subtitle is-6" style="color: ghostwhite;">
+                @{{ waiter.user.username }}
+            </p>
+            <a href="{% url 'tips:cafe' waiter.cafe.slug %}">
+                <p class="subtitle is-6" style="color: ghostwhite;">
+                    Cafe: @{{ waiter.cafe.slug }} {{ waiter.cafe.title }}
+                </p>
+            </a>
+            <div class="columns">
+                <div class="column has-text-centered">
+                    <a class="button is-white is-outlined">
+                        <span class="icon">
+                            <i class="fa fa-coffee"></i>
+                        </span>
+                        <span>Tip!</span>
+                    </a>
+                </div>
+              </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
