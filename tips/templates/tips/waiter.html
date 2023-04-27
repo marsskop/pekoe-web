@@ -26,7 +26,12 @@
             </a>
             <div class="columns">
                 <div class="column has-text-centered">
-                    <a class="button is-white is-outlined">
+                    {% if not request.user.is_authenticated %}
+                    <p style="color: gray;">
+                        Unauthorized
+                    </p>
+                    {% endif %}
+                    <button class="button is-white is-outlined"{% if not request.user.is_authenticated %} disabled{% endif %}>
                         <span class="icon">
                             <i class="fa fa-coffee"></i>
                         </span>
