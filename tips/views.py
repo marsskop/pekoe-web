@@ -56,17 +56,17 @@ def iamview(request, username):
             if len(user_form.changed_data) > 0:
                 messages.success(request, "Your user profile was updated successfully")
             return redirect('tips:user', username=request.user.username)
-        if customer_form.is_valid():
-            customer_form.save()
-            if len(customer_form.changed_data) > 0:
-                messages.success(request, "Customer wallet was changed successfully.")
-            return redirect('tips:user', username=request.user.username)
-        for cafe in waiter_forms:
-            if waiter_forms[cafe].is_valid():
-                waiter_forms[cafe].save()
-                if len(waiter_forms[cafe].changed_data) > 0:
-                    messages.success(request, f"Waiter wallet for cafe {cafe} was changed successfully.")
-                return redirect('tips:user', username=request.user.username)
+        # if customer_form.is_valid():
+        #     customer_form.save()
+        #     if len(customer_form.changed_data) > 0:
+        #         messages.success(request, "Customer wallet was changed successfully.")
+        #     return redirect('tips:user', username=request.user.username)
+        # for cafe in waiter_forms:
+        #     if waiter_forms[cafe].is_valid():
+        #         waiter_forms[cafe].save()
+        #         if len(waiter_forms[cafe].changed_data) > 0:
+        #             messages.success(request, f"Waiter wallet for cafe {cafe} was changed successfully.")
+        #         return redirect('tips:user', username=request.user.username)
     else:
         user_form = user_form_class(instance=request.user)
         customer_form = customer_form_class(instance=request.user.customer)

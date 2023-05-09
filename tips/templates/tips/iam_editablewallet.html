@@ -92,18 +92,28 @@
               </figure>
         </div>
         <div class="media-content">
-            <div class="field is-horizontal">
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control has-icons-left is-expanded">
-                            {{ customer_form.customer_wallet|add_class:"input" }}
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-wallet"></i>
-                            </span>
-                        </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ customer_form.customer_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
@@ -127,18 +137,28 @@
                 </p>
             </a>
             <br>
-            <div class="field is-horizontal">
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control has-icons-left is-expanded">
-                            {{ form.waiter_wallet|add_class:"input" }}
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-wallet"></i>
-                            </span>
-                        </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ form.waiter_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
             </div>
         </div>
         {% endfor %}

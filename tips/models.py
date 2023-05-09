@@ -1,8 +1,9 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from .web3_client import Web3Client
 
 
 class Cafe(models.Model):
@@ -42,20 +43,29 @@ class Customer(models.Model):
         return f"Customer {self.user.username}, wallet: {self.customer_wallet}"
 
 
-# automatically add Customer role to User
+# automatically add Customer role to User and create account
 @receiver(post_save, sender=User)
 def create_customer(sender, instance, created, **kwargs):
     if created:
-        customer = Customer(user=instance)
+        customer_address = Web3Client().create_account()
+        customer = Customer(user=instance, customer_wallet=customer_address)
         customer.save()
 
 
 class Waiter(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    waiter_wallet = models.CharField(max_length=50)
+    waiter_wallet = models.CharField(max_length=5, blank=True)
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
     def __str__(self):
         return f"Waiter {self.user.username} in cafe {self.cafe.title}, wallet: {self.waiter_wallet}"
+
+
+# automatically create account for waiter
+@receiver(pre_save, sender=Waiter)
+def create_waiter_account(sender, instance, **kwargs):
+    if instance.waiter_wallet == "" or instance.waiter_wallet is None:
+        waiter_address = Web3Client().create_account()
+        instance.waiter_wallet = waiter_address
 
 
 class CafeAdmin(models.Model):
