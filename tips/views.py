@@ -8,8 +8,9 @@ from django import forms
 from django.forms import modelform_factory
 from django.contrib.auth.decorators import login_required
 
-from .models import Cafe, Waiter, User, Customer
-from .forms import NewUserForm
+from .models import Cafe, Waiter, User, Customer, Transaction
+from .forms import NewUserForm, TipForm
+from .web3_client import Web3Client
 
 
 class IndexView(generic.ListView):
@@ -42,6 +43,42 @@ class WaiterView(generic.DetailView):
         return self.model.objects.get(cafe=Cafe.objects.get(slug=self.kwargs['cafe_slug']), user=User.objects.get(username=self.kwargs['waiter_username']))
 
 
+def waiterview(request, cafe_slug, waiter_username):
+    waiter = Waiter.objects.get(cafe=Cafe.objects.get(slug=cafe_slug), user=User.objects.get(username=waiter_username))
+    if request.method == "POST":
+        form = TipForm(request.POST)
+        if form.is_valid():
+            rub_amount = form.cleaned_data.get('rub_amount')
+            web3client = Web3Client()
+            # buy rub_amount of PEKOE tokens
+            buy_status = web3client.buy(request.user.customer.customer_wallet, rub_amount)
+            if not buy_status:
+                messages.error(request, f"Could not buy {rub_amount} PEKOE tokens...")
+                return redirect("tips:waiter", cafe_slug=cafe_slug, waiter_username=waiter_username)
+            # transfer rub_amount PEKOE tokens from customer to waiter
+            transfer_status = web3client.transfer(request.user.customer.customer_wallet, waiter.waiter_wallet, rub_amount, 'CUSTOMER_PK')  # TODO: use Metamask
+            if not transfer_status:
+                messages.error(request, f"Could not transfer {rub_amount} PEKOE tokens to @{waiter_username}...")
+                return redirect("tips:waiter", cafe_slug=cafe_slug, waiter_username=waiter_username)
+            # save transaction to db
+            txn = Transaction(customer=request.user.customer, waiter=waiter, amount=rub_amount, comment="")  # TODO: add comment field
+            txn.save(force_insert=True)
+            # burn and mint tokens from waiter
+            fiat_status = web3client.exchange_fiat(waiter.waiter_wallet, rub_amount, 'WAITER_PK')  # TODO: to move to waiter page
+            if not fiat_status:
+                messages.error(request, f"Could not exchange {rub_amount} for fiat for @{waiter_username}...")
+                return redirect("tips:waiter", cafe_slug=cafe_slug, waiter_username=waiter_username)
+            messages.success(request, f"You've tipped waiter @{waiter_username}!")
+            return redirect("tips:waiter", cafe_slug=cafe_slug, waiter_username=waiter_username)
+        messages.error(request, f"Could not tip @{waiter_username}")
+    form = TipForm()
+    context = {
+        "waiter": waiter,
+        "tip_form": form
+    }
+    return render(request=request, template_name='tips/waiter.html', context=context)
+
+
 @login_required
 def iamview(request, username):
     user_form_class = modelform_factory(User, fields=['first_name', 'last_name', 'email'], widgets={'first_name': forms.TextInput, 'last_name': forms.TextInput, 'email': forms.EmailInput})
@@ -56,17 +93,17 @@ def iamview(request, username):
             if len(user_form.changed_data) > 0:
                 messages.success(request, "Your user profile was updated successfully")
             return redirect('tips:user', username=request.user.username)
-        # if customer_form.is_valid():
-        #     customer_form.save()
-        #     if len(customer_form.changed_data) > 0:
-        #         messages.success(request, "Customer wallet was changed successfully.")
-        #     return redirect('tips:user', username=request.user.username)
-        # for cafe in waiter_forms:
-        #     if waiter_forms[cafe].is_valid():
-        #         waiter_forms[cafe].save()
-        #         if len(waiter_forms[cafe].changed_data) > 0:
-        #             messages.success(request, f"Waiter wallet for cafe {cafe} was changed successfully.")
-        #         return redirect('tips:user', username=request.user.username)
+        if customer_form.is_valid():
+            customer_form.save()
+            if len(customer_form.changed_data) > 0:
+                messages.success(request, "Customer wallet was changed successfully.")
+            return redirect('tips:user', username=request.user.username)
+        for cafe in waiter_forms:
+            if waiter_forms[cafe].is_valid():
+                waiter_forms[cafe].save()
+                if len(waiter_forms[cafe].changed_data) > 0:
+                    messages.success(request, f"Waiter wallet for cafe {cafe} was changed successfully.")
+                return redirect('tips:user', username=request.user.username)
     else:
         user_form = user_form_class(instance=request.user)
         customer_form = customer_form_class(instance=request.user.customer)
@@ -77,7 +114,8 @@ def iamview(request, username):
         "cafe_admins_list": request.user.cafeadmin_set.all(),
         "user_form": user_form,
         "customer_form": customer_form,
-        "waiter_forms": waiter_forms
+        "waiter_forms": waiter_forms,
+        "customer_transactions": request.user.customer.transaction_set.all()
     }
     return render(request=request, template_name="tips/iam.html", context=context)
 

@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
+from django.core.validators import MinLengthValidator
 from .web3_client import Web3Client
 
 
@@ -37,35 +38,33 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Customer(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    customer_wallet = models.CharField(max_length=50)
+    customer_wallet = models.CharField(max_length=42, validators=[MinLengthValidator(42)])
 
     def __str__(self):
         return f"Customer {self.user.username}, wallet: {self.customer_wallet}"
 
 
-# automatically add Customer role to User and create account
+# automatically add Customer role to User
 @receiver(post_save, sender=User)
 def create_customer(sender, instance, created, **kwargs):
     if created:
-        customer_address = Web3Client().create_account()
-        customer = Customer(user=instance, customer_wallet=customer_address)
+        customer = Customer(user=instance)
         customer.save()
 
 
 class Waiter(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    waiter_wallet = models.CharField(max_length=5, blank=True)
+    waiter_wallet = models.CharField(max_length=42, blank=True, validators=[MinLengthValidator(42)])
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
     def __str__(self):
         return f"Waiter {self.user.username} in cafe {self.cafe.title}, wallet: {self.waiter_wallet}"
 
 
-# automatically create account for waiter
+# automatically fill in customer account for waiter
 @receiver(pre_save, sender=Waiter)
 def create_waiter_account(sender, instance, **kwargs):
     if instance.waiter_wallet == "" or instance.waiter_wallet is None:
-        waiter_address = Web3Client().create_account()
-        instance.waiter_wallet = waiter_address
+        instance.waiter_wallet = instance.user.customer.customer_wallet
 
 
 class CafeAdmin(models.Model):
@@ -77,7 +76,7 @@ class CafeAdmin(models.Model):
 
 class Transaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)  # should we delete transactions?
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)  # TODO: do not delete transactions
     waiter = models.ForeignKey(Waiter, on_delete=models.CASCADE)
     datetime = models.DateTimeField(auto_now=True)
     amount = models.PositiveBigIntegerField()

@@ -92,20 +92,51 @@
               </figure>
         </div>
         <div class="media-content">
-            <div class="field is-horizontal">
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control has-icons-left is-expanded">
-                            {{ customer_form.customer_wallet|add_class:"input" }}
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-wallet"></i>
-                            </span>
-                        </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ customer_form.customer_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+    {% if customer_transactions %}
+    <div class="column has-text-centered">
+        <h1 class="title" style="color: ghostwhite;">Completed Transactions</h1><br>
+      </div>
+    {% for transaction in customer_transactions %}
+    <div class="media">
+        <div class="media-left">
+            <span class="icon">
+                <i class="fa fa-credit-card"></i>
+            </span>
+        </div>
+        <div class="media-content">
+            <span>
+                <p class="subtitle is-6" style="color: ghostwhite;">
+                    {{ transaction }}
+                  </p>
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
 </div>
 
 <div id="waiter" class="tabcontent" style="display: none">
@@ -127,18 +158,28 @@
                 </p>
             </a>
             <br>
-            <div class="field is-horizontal">
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control has-icons-left is-expanded">
-                            {{ form.waiter_wallet|add_class:"input" }}
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-wallet"></i>
-                            </span>
-                        </p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="field is-horizontal">
+                    <div class="field-body">
+                        <div class="field">
+                            <p class="control has-icons-left is-expanded">
+                                {{ form.waiter_wallet|add_class:"input" }}
+                                <span class="icon is-small is-left">
+                                    <i class="fas fa-wallet"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <button class="button is-primary" type="submit">
+                                    Update
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
             </div>
         </div>
         {% endfor %}

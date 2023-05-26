@@ -21,3 +21,6 @@ class NewUserForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class TipForm(forms.Form):
+    rub_amount = forms.IntegerField(label="rub_amount")
