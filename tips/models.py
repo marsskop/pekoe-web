@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractBaseUser, UserManager, Permission
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core.validators import MinLengthValidator
-from .web3_client import Web3Client
 
 
 class Cafe(models.Model):
@@ -22,8 +21,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=20)
     email = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False) # a admin user; non super-user
-    is_superuser = models.BooleanField(default=False) # a superuser
+    is_staff = models.BooleanField(default=False)  # a admin user; non super-user
+    is_superuser = models.BooleanField(default=False)  # a superuser
     last_login = models.DateTimeField(null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
 
@@ -56,6 +55,7 @@ class Waiter(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     waiter_wallet = models.CharField(max_length=42, blank=True, validators=[MinLengthValidator(42)])
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+
     def __str__(self):
         return f"Waiter {self.user.username} in cafe {self.cafe.title}, wallet: {self.waiter_wallet}"
 
@@ -70,6 +70,7 @@ def create_waiter_account(sender, instance, **kwargs):
 class CafeAdmin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     cafe = models.ForeignKey(Cafe, on_delete=models.CASCADE)
+
     def __str__(self):
         return f"Cafe admin {self.user.username} in cafe {self.cafe.title}"
 
@@ -83,4 +84,5 @@ class Transaction(models.Model):
     comment = models.CharField(max_length=200)
 
     def __str__(self):
-        return f"Transaction {self.id} from customer {self.customer} to waiter {self.waiter}, datetime: {self.datetime}, amount: {self.amount}, comment: {self.comment}"
+        return (f"Transaction {self.id} from customer {self.customer} to waiter {self.waiter},"
+                f"datetime: {self.datetime}, amount: {self.amount}, comment: {self.comment}")

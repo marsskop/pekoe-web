@@ -6,6 +6,7 @@ import os
 
 class SingletonMetaclass(type):
     _instance = None
+
     def __call__(cls, *args, **kwargs):
         assert not (args or kwargs), 'Singletone does not accept arguments'
         if isinstance(cls._instance, cls):
@@ -38,14 +39,14 @@ class Web3Client(metaclass=SingletonMetaclass):
             self.abi = f.read()
         self.pekoe = self.w3.eth.contract(address=self.address, abi=self.abi)
         print(f'Contract instance {self.address} initialized.')
-    
+
     # balance of deployment_account
     def balance(self):
         return self.pekoe.functions.balanceOf(self.deployment_account.address).call()
-    
+
     def balance_of(self, account):
         return self.pekoe.functions.balanceOf(account).call()
-    
+
     # simulate buying of the tokens
     def buy(self, account, amount):
         print(f"Buying {amount} PEKOE tokens for {account}...")
@@ -60,7 +61,7 @@ class Web3Client(metaclass=SingletonMetaclass):
         print(tx_receipt)
         print(f"{amount} PEKOE tokens for {account} bought.")
         return True
-    
+
     # transfer ETH to the account to pay gas fees
     def _transfer_fee(self, account, eth):
         print(f"Transferring {eth} ETH for gas fees to account {account}...")
@@ -76,19 +77,20 @@ class Web3Client(metaclass=SingletonMetaclass):
         print(tx_receipt)
         print(f'{eth} ETH for gas fee to {account} transferred.')
         return True
-    
-    # approve usage(transferFrom/burnFrom) for amount of tokens of account for deployment_account 
+
+    # approve usage(transferFrom/burnFrom) for amount of tokens of account for deployment_account
     def _approve_allowance(self, account, amount, pk_env):
         # check allowance
         cur_allowance = self.pekoe.functions.allowance(account, self.deployment_account.address).call()
         if cur_allowance < amount:
             print(f"Approving retrieval of {amount} PEKOE tokens from {account} for {self.deployment_account.address}...")
             # should approve first
-            unsent_approve_tx = self.pekoe.functions.approve(self.deployment_account.address, amount - cur_allowance).build_transaction({
-                'from': account,
-                'nonce': self.w3.eth.get_transaction_count(account)})
+            unsent_approve_tx = self.pekoe.functions.approve(self.deployment_account.address,
+                                                             amount - cur_allowance).build_transaction(
+                {'from': account, 'nonce': self.w3.eth.get_transaction_count(account)})
             self._transfer_fee(account, unsent_approve_tx['maxFeePerGas'] * unsent_approve_tx['gas'])
-            signed_approve_tx = self.w3.eth.account.sign_transaction(unsent_approve_tx, private_key=os.environ.get(pk_env))  # optimally: inject Metamask
+            signed_approve_tx = self.w3.eth.account.sign_transaction(unsent_approve_tx,
+                                                                     private_key=os.environ.get(pk_env))
             approve_tx_hash = self.w3.eth.send_raw_transaction(signed_approve_tx.rawTransaction)
             try:
                 approve_tx_receipt = self.w3.eth.wait_for_transaction_receipt(approve_tx_hash)
@@ -105,23 +107,25 @@ class Web3Client(metaclass=SingletonMetaclass):
         if not approval_res:
             return False
         print(f'Transferring {amount} PEKOE tokens from customer {from_account} to waiter {to_account}...')
-        tx_hash = self.pekoe.functions.transferFrom(from_account, to_account, amount).transact({'from': self.deployment_account.address})
+        tx_hash = self.pekoe.functions.transferFrom(from_account, to_account,
+                                                    amount).transact({'from': self.deployment_account.address})
         try:
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        except TimeExhausted as e:
+        except TimeExhausted:
             print(f"Transaction {tx_hash} took to long to be added to the block.")
             return False
         print(tx_receipt)
         print(f'Transferred {amount} PEKOE tokens from customer {from_account} to waiter {to_account}.')
         return tx_receipt["status"] == 1
-    
+
     def _mint(self, amount):
         print(f"Deployment account balance: {self.balance()}")
         print(f"Minting {amount} PEKOE tokens after burning...")
-        tx_hash = self.pekoe.functions.mint(self.deployment_account.address, amount).transact({'from': self.deployment_account.address})
+        tx_hash = self.pekoe.functions.mint(self.deployment_account.address,
+                                            amount).transact({'from': self.deployment_account.address})
         try:
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        except TimeExhausted as e:
+        except TimeExhausted:
             print(f"Transaction {tx_hash} took to long to be added to the block.")
             return False
         print(tx_receipt)
@@ -137,7 +141,7 @@ class Web3Client(metaclass=SingletonMetaclass):
         tx_hash = self.pekoe.functions.burnFrom(account, amount).transact({'from': self.deployment_account.address})
         try:
             tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        except TimeExhausted as e:
+        except TimeExhausted:
             print(f"Transaction {tx_hash} took to long to be added to the block.")
             return False
         print(tx_receipt)
