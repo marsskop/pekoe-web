@@ -33,7 +33,12 @@
                         Unauthorized
                     </p>
                     {% endif %}
-                    <button class="js-modal-trigger button is-white is-outlined" data-target="modal-js-example" {% if not request.user.is_authenticated %} disabled{% endif %}>
+                    {% if request.user.username == waiter.user.username %}
+                    <p style="color: gray;">
+                      You can't tip yourself!
+                    </p>
+                    {% endif %}
+                    <button class="js-modal-trigger button is-white is-outlined" data-target="modal-js-example" {% if not request.user.is_authenticated or request.user.username == waiter.user.username %} disabled{% endif %}>
                         <span class="icon">
                             <i class="fa fa-coffee"></i>
                         </span>

@@ -58,6 +58,13 @@
             </div>
         </form>
     </div>
+    <div class="media-right">
+        <p class="title is-4" style="color: ghostwhite;">
+            <span class="icon">
+                <i class="fa fa-diamond"></i>
+            </span>
+            <span>{{ customer_balance }} PEKOE</span></p>
+    </div>
 </div>
 
 <br>
@@ -115,11 +122,16 @@
                 </div>
             </form>
         </div>
+        <div class="media-right">
+            <p class="subtitle is-6" style="color: ghostwhite;">
+                <span class="icon">
+                    <i class="fa fa-diamond"></i>
+                </span>
+                <span>{{ customer_balance }} PEKOE</span>
+            </p>
+        </div>
     </div>
     {% if customer_transactions %}
-    <div class="column has-text-centered">
-        <h1 class="title" style="color: ghostwhite;">Completed Transactions</h1><br>
-      </div>
     {% for transaction in customer_transactions %}
     <div class="media">
         <div class="media-left">
@@ -130,7 +142,21 @@
         <div class="media-content">
             <span>
                 <p class="subtitle is-6" style="color: ghostwhite;">
-                    {{ transaction }}
+                    <span class="icon is-small">
+                        <i class="fa fa-diamond"></i>
+                    </span>
+                    <span>{{transaction.amount}} PEKOE tokens</span>
+                    <span>from: @{{transaction.customer.user.username}}</span>
+                    <span class="icon is-small">
+                        <i class="fa fa-wallet"></i>
+                    </span>
+                    <span>{{transaction.customer.customer_wallet}}</span>
+                    <span>to: @{{transaction.waiter.user.username}}</span>
+                    <span class="icon is-small">
+                        <i class="fa fa-wallet"></i>
+                    </span>
+                    <span>{{transaction.waiter.waiter_wallet}}</span>
+
                   </p>
             </span>
         </div>
@@ -181,7 +207,47 @@
                 </div>
             </form>
             </div>
+            <div class="media-right">
+                <p class="subtitle is-6" style="color: ghostwhite;">
+                    <span class="icon">
+                        <i class="fa fa-diamond"></i>
+                    </span>
+                    <span>{{ waiter_balance|get_item:key }} PEKOE</span>
+                </p>
+            </div>
         </div>
+        {% if waiter_transactions|get_item:key %}
+        {% for transaction in waiter_transactions|get_item:key %}
+        <div class="media">
+            <div class="media-left">
+                <span class="icon">
+                    <i class="fa fa-credit-card"></i>
+                </span>
+            </div>
+            <div class="media-content">
+                <span>
+                    <p class="subtitle is-6" style="color: ghostwhite;">
+                        <span class="icon is-small">
+                            <i class="fa fa-diamond"></i>
+                        </span>
+                        <span>{{transaction.amount}} PEKOE tokens</span>
+                        <span>from: @{{transaction.customer.user.username}}</span>
+                        <span class="icon is-small">
+                            <i class="fa fa-wallet"></i>
+                        </span>
+                        <span>{{transaction.customer.customer_wallet}}</span>
+                        <span>to: @{{transaction.waiter.user.username}}</span>
+                        <span class="icon is-small">
+                            <i class="fa fa-wallet"></i>
+                        </span>
+                        <span>{{transaction.waiter.waiter_wallet}}</span>
+
+                    </p>
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endfor %}
         {% else %}
         <h2 class="subtitle is-6" style="color: ghostwhite;">

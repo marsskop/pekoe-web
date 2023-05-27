@@ -81,6 +81,7 @@ def waiterview(request, cafe_slug, waiter_username):
 
 @login_required
 def iamview(request, username):
+    web3client = Web3Client()
     user_form_class = modelform_factory(User, fields=['first_name', 'last_name', 'email'], widgets={'first_name': forms.TextInput, 'last_name': forms.TextInput, 'email': forms.EmailInput})
     customer_form_class = modelform_factory(Customer, fields=["customer_wallet"], widgets={"customer_wallet": forms.TextInput})
     waiter_form_class = modelform_factory(Waiter, fields=["waiter_wallet"], widgets={"waiter_wallet": forms.TextInput})
@@ -114,8 +115,11 @@ def iamview(request, username):
         "cafe_admins_list": request.user.cafeadmin_set.all(),
         "user_form": user_form,
         "customer_form": customer_form,
+        "customer_transactions": request.user.customer.transaction_set.all(),
+        "customer_balance":  web3client.balance_of(request.user.customer.customer_wallet),
         "waiter_forms": waiter_forms,
-        "customer_transactions": request.user.customer.transaction_set.all()
+        "waiter_transactions": {waiter.cafe.slug: waiter.transaction_set.all() for waiter in request.user.waiter_set.all()},
+        "waiter_balance": {waiter.cafe.slug: web3client.balance_of(waiter.waiter_wallet) for waiter in request.user.waiter_set.all()}
     }
     return render(request=request, template_name="tips/iam.html", context=context)
 

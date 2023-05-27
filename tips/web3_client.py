@@ -39,8 +39,12 @@ class Web3Client(metaclass=SingletonMetaclass):
         self.pekoe = self.w3.eth.contract(address=self.address, abi=self.abi)
         print(f'Contract instance {self.address} initialized.')
     
+    # balance of deployment_account
     def balance(self):
         return self.pekoe.functions.balanceOf(self.deployment_account.address).call()
+    
+    def balance_of(self, account):
+        return self.pekoe.functions.balanceOf(account).call()
     
     # simulate buying of the tokens
     def buy(self, account, amount):
