@@ -6,20 +6,28 @@ from django.dispatch import receiver
 from django.core.validators import MinLengthValidator
 
 
+def cafe_upload_path(instance, filename):
+    return f"cafe_{instance.slug}/{filename}"
+
 class Cafe(models.Model):
     slug = models.CharField(max_length=20, unique=True, default=uuid.uuid4().hex[:16])
     title = models.CharField(max_length=50)
     location = models.CharField(max_length=100)
+    avatar = models.ImageField(upload_to=cafe_upload_path, blank=True)
 
     def __str__(self):
         return f"Cafe @{self.slug} {self.title}, location: {self.location}"
 
+
+def user_upload_path(instance, filename):
+    return f"user_{instance.username}/{filename}"
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=20, unique=True, default=uuid.uuid4().hex[:16])
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
     email = models.CharField(max_length=50)
+    avatar = models.ImageField(upload_to=user_upload_path, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # a admin user; non super-user
     is_superuser = models.BooleanField(default=False)  # a superuser

@@ -28,7 +28,7 @@
                 {% if request.user.is_authenticated %}
                   <span class="navbar-item">
                     <a class="image is-32x32" href="{% url 'tips:user' user.username %}">
-                      <img class="is-rounded" src="https://loremflickr.com/200/200" alt="Placeholder Image">
+                      <img class="is-rounded" src="{{ user.avatar.url }}">
                     </a>
                   </span>
                   <span class="navbar-item">

@@ -3,6 +3,8 @@
 
 A web app for 🌿**PEKOE**🌿, crypto safe tips service. Written in Python3 x Django.
 
+![main page of PEKOE web app](assets/images/main1.png "Main page of PEKOE web app")
+
 ### 🔧 Development guide
 #### Setup development environment
 ```

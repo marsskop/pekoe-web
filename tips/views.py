@@ -124,6 +124,8 @@ def iamview(request, username):
         "customer_transactions": request.user.customer.transaction_set.all(),
         "customer_balance":  web3client.balance_of(request.user.customer.customer_wallet),
         "waiter_forms": waiter_forms,
+        "cafes_avatars": {waiter.cafe.slug: waiter.cafe.avatar.url
+                          for waiter in request.user.waiter_set.all()},
         "waiter_transactions": {waiter.cafe.slug: waiter.transaction_set.all()
                                 for waiter in request.user.waiter_set.all()},
         "waiter_balance": {waiter.cafe.slug: web3client.balance_of(waiter.waiter_wallet)

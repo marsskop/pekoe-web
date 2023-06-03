@@ -1,3 +1,4 @@
 db.sqlite3
 .DS_store
 .env
+pekoe_web/media

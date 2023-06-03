@@ -10,8 +10,7 @@
 <div class="media">
     <div class="media-left">
         <figure class="image is-48x48">
-        <img src="https://loremflickr.com/200/200?random=1"
-                alt="Placeholder image">
+        <img src="{{ user.avatar.url }}">
         </figure>
     </div>
     <div class="media-content">
@@ -172,8 +171,7 @@
             <div class="media-left">
                 <a href="{% url 'tips:waiter' cafe_slug=key waiter_username=user.username %}">
                 <figure class="image is-48x48">
-                    <img src="https://loremflickr.com/200/200/cafe?random=1"
-                        alt="Placeholder image">
+                    <img src="{{ cafes_avatars|get_item:key }}">
                   </figure>
                 </a>
             </div>
@@ -265,8 +263,7 @@
         <div class="media">
             <div class="media-left">
                 <figure class="image is-48x48">
-                    <img src="https://loremflickr.com/200/200/cafe?random=1"
-                        alt="Placeholder image">
+                    <img src="{{ cafe_admin.cafe.avatar.url }}">
                 </figure>
             </div>
             <div class="media-content">
