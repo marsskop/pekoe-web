@@ -86,7 +86,7 @@ class CafeAdmin(models.Model):
 class Transaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)  # TODO: do not delete transactions
-    waiter = models.ForeignKey(Waiter, on_delete=models.CASCADE)
+    waiter = models.ForeignKey(Waiter, on_delete=models.CASCADE)  # TODO: store addresses? in case of change
     datetime = models.DateTimeField(auto_now=True)
     amount = models.PositiveBigIntegerField()
     comment = models.CharField(max_length=200)

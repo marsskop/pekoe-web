@@ -49,6 +49,7 @@ def waiterview(request, cafe_slug, waiter_username):
         form = TipForm(request.POST)
         if form.is_valid():
             rub_amount = form.cleaned_data.get('rub_amount')
+            comment = form.cleaned_data.get('comment')
             web3client = Web3Client()
             # buy rub_amount of PEKOE tokens
             buy_status = web3client.buy(request.user.customer.customer_wallet, rub_amount)
@@ -63,7 +64,7 @@ def waiterview(request, cafe_slug, waiter_username):
                 return redirect("tips:waiter", cafe_slug=cafe_slug, waiter_username=waiter_username)
             # save transaction to db
             txn = Transaction(customer=request.user.customer, waiter=waiter,
-                              amount=rub_amount, comment="")  # TODO: add comment field
+                              amount=rub_amount, comment=comment)
             txn.save(force_insert=True)
             # burn and mint tokens from waiter
             fiat_status = web3client.exchange_fiat(waiter.waiter_wallet,

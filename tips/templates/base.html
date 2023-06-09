@@ -28,7 +28,9 @@
                 {% if request.user.is_authenticated %}
                   <span class="navbar-item">
                     <a class="image is-32x32" href="{% url 'tips:user' user.username %}">
+                      {% if user.avatar %}
                       <img class="is-rounded" src="{{ user.avatar.url }}">
+                      {% endif %}
                     </a>
                   </span>
                   <span class="navbar-item">

@@ -26,3 +26,4 @@ class NewUserForm(UserCreationForm):
 
 class TipForm(forms.Form):
     rub_amount = forms.IntegerField(label="rub_amount")
+    comment = forms.CharField(max_length=200)
